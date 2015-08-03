@@ -1,0 +1,7 @@
+require "active_record"
+require "replidog/model"
+require "replidog/proxy"
+require "replidog/proxy_handler"
+require "replidog/scope_proxy"
+require "replidog/version"
+require "replidog/active_record"
