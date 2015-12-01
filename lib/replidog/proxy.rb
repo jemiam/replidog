@@ -102,8 +102,8 @@ module Replidog
       end
     end
 
-    def respond_to_missing(method, include_private = false)
-      super || master_connectio.respond_to?(method, include_private)
+    def respond_to_missing?(method, *args)
+      master_connection.respond_to?(method, *args) || super
     end
 
     def connection_by_method_name(method_name)
