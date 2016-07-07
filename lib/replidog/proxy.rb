@@ -172,12 +172,10 @@ module Replidog
 
       def create
         spec =
-          if ActiveRecord::VERSION::MAJOR >= 4
-            if ActiveRecord::VERSION::MINOR < 1
-              ActiveRecord::ConnectionAdapters::ConnectionSpecification::Resolver.new(@configuration, {}).spec
-            else
-              ActiveRecord::ConnectionAdapters::ConnectionSpecification::Resolver.new({}).spec(@configuration)
-            end
+          if ActiveRecord::VERSION::MAJOR >= 5 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR >= 1)
+            ActiveRecord::ConnectionAdapters::ConnectionSpecification::Resolver.new({}).spec(@configuration)
+          elsif ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR < 1
+            ActiveRecord::ConnectionAdapters::ConnectionSpecification::Resolver.new(@configuration, {}).spec
           else
             ActiveRecord::Base::ConnectionSpecification::Resolver.new(@configuration, {}).spec
           end
