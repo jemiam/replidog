@@ -8,28 +8,51 @@ module Replidog
       base.proxy_handler = Replidog::ProxyHandler.new
 
       class << base
-        alias_method_chain(:establish_connection, :replidog)
-        alias_method_chain(:connection, :replidog)
-        alias_method_chain(:connected?, :replidog)
-        alias_method_chain(:clear_reloadable_connections!, :replidog)
-        alias_method_chain(:clear_active_connections!, :replidog)
-        alias_method_chain(:clear_all_connections!, :replidog)
+        alias_method :connected_without_replidog?, :connected?
+        alias_method :connection_without_replidog, :connection
+
+        prepend BaseWithReplidogSupport
       end
     end
 
-    def establish_connection_with_replidog(spec = ENV["DATABASE_URL"])
-      establish_connection_without_replidog(spec)
-      proxy_handler.remove_connection(self)
-      proxy_handler.establish_connection(connection_pool.spec, self)
-    end
+    module BaseWithReplidogSupport
+      def establish_connection(spec = ENV["DATABASE_URL"])
+        super
+        proxy_handler.remove_connection(self)
+        proxy_handler.establish_connection(connection_pool.spec, self)
+      end
 
-    def connection_with_replidog
-      if replicated?
-        proxy_handler.retrieve_proxy(self).tap do |proxy|
-          proxy.current_model = self
+      def connection
+        if replicated?
+          proxy_handler.retrieve_proxy(self).tap do |proxy|
+            proxy.current_model = self
+          end
+        else
+          super
         end
-      else
-        connection_without_replidog
+      end
+
+      def connected?
+        if replicated?
+          connection.connected?
+        else
+          super
+        end
+      end
+
+      def clear_active_connections!
+        super
+        proxy_handler.clear_active_slave_connections! if replicated?
+      end
+
+      def clear_reloadable_connections!
+        super
+        proxy_handler.clear_reloadable_slave_connections! if replicated?
+      end
+
+      def clear_all_connections!
+        super
+        proxy_handler.clear_all_slave_connections! if replicated?
       end
     end
 
@@ -47,29 +70,6 @@ module Replidog
           self
         end
       end
-    end
-
-    def connected_with_replidog?
-      if replicated?
-        connection.connected?
-      else
-        connected_without_replidog?
-      end
-    end
-
-    def clear_active_connections_with_replidog!
-      clear_active_connections_without_replidog!
-      proxy_handler.clear_active_slave_connections! if replicated?
-    end
-
-    def clear_reloadable_connections_with_replidog!
-      clear_reloadable_connections_without_replidog!
-      proxy_handler.clear_reloadable_slave_connections! if replicated?
-    end
-
-    def clear_all_connections_with_replidog!
-      clear_all_connections_without_replidog!
-      proxy_handler.clear_all_slave_connections! if replicated?
     end
 
     private
