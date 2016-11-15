@@ -58,6 +58,7 @@ module Replidog
 
     def clear_all_slave_connections!
       slave_connection_pool_table.each_value do |pool|
+        pool.automatic_reconnect = false
         pool.disconnect!
       end
     end

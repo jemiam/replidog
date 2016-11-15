@@ -2,8 +2,8 @@ require "spec_helper"
 
 describe Replidog::Proxy do
   before do
-    # call establish_connection
-    UserTable
+    ActiveRecord::Base.establish_connection
+    UserTable.establish_connection :test_user
   end
 
   describe "#enable_query_cache!" do
