@@ -1,29 +1,36 @@
+require "concurrent/map"
+
 module Replidog
   class ProxyHandler
     def initialize
-      @proxies = {}
-      @class_to_proxy = {}
+      @proxies = Concurrent::Map.new(initial_capacity: 2)
+      @class_to_proxy = Concurrent::Map.new(initial_capacity: 2)
     end
 
     def establish_connection(configuration, klass)
-      @proxies[configuration] ||= Proxy.new(self, configuration)
-      @class_to_proxy[klass.name] ||= @proxies[configuration]
+      @class_to_proxy.clear
+      raise RuntimeError, "Anonymous class is not allowed." unless klass.name
+      @proxies[klass.name] = Proxy.new(self, configuration)
     end
 
     def retrieve_proxy(klass)
-      proxy = @class_to_proxy[klass.name]
-      return proxy if proxy
-      return nil if ActiveRecord::Base == klass
-      retrieve_proxy(klass.superclass)
+      @class_to_proxy[klass.name] ||=
+        begin
+          until proxy = @proxies[klass.name]
+            klass = klass.superclass
+            break unless klass <= ActiveRecord::Base
+          end
+
+          @class_to_proxy[klass.name] = proxy
+        end
     end
 
     def remove_connection(klass)
-      proxy = @class_to_proxy.delete(klass.name)
-      return nil unless proxy
-
-      @proxies.delete(proxy.configuration)
-      proxy.clear_all_slave_connections!
-      proxy.configuration.config
+      if proxy = @proxies.delete(klass.name)
+        @class_to_proxy.clear
+        proxy.clear_all_slave_connections!
+        proxy.configuration.config
+      end
     end
 
     def clear_active_slave_connections!
