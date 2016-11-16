@@ -14,6 +14,7 @@ module Replidog
     def initialize(handler, configuration)
       @handler = handler
       @configuration = configuration
+      @lock = Mutex.new
     end
 
     def current_model
@@ -150,7 +151,9 @@ module Replidog
     end
 
     def slave_connection_index
-      index.tap { increment_slave_connection_index }
+      @lock.synchronize do
+        index.tap { increment_slave_connection_index }
+      end
     end
 
     def increment_slave_connection_index

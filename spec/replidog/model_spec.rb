@@ -10,6 +10,11 @@ describe Replidog::Model do
     User.using(:slave).first
   end
 
+  before do
+    ActiveRecord::Base.establish_connection
+    UserTable.establish_connection :test_user
+  end
+
   describe ".extended" do
     it "shares the same proxy_handler" do
       expect(Recipe.proxy_handler).to eq User.proxy_handler
@@ -79,18 +84,49 @@ describe Replidog::Model do
         expect(Recipe.first).to be_nil
       end
 
-      it "selects replications by roundrobin order" do
-        Recipe.using(:slave1).create(title: "test")
-        Recipe.connection.index = 0
-        expect(Recipe.first).not_to be_nil
-        expect(Recipe.first).to be_nil
-        expect(Recipe.first).to be_nil
-        expect(Recipe.first).not_to be_nil
-        expect(Recipe.first).to be_nil
-        expect(Recipe.first).to be_nil
-        expect(Recipe.first).not_to be_nil
-        expect(Recipe.first).to be_nil
-        expect(Recipe.first).to be_nil
+      context "with single thread" do
+        it "selects replications by roundrobin order" do
+          Recipe.using(:slave1).create(title: "test")
+          Recipe.connection.index = 0
+          expect(Recipe.first).not_to be_nil
+          expect(Recipe.first).to be_nil
+          expect(Recipe.first).to be_nil
+          expect(Recipe.first).not_to be_nil
+          expect(Recipe.first).to be_nil
+          expect(Recipe.first).to be_nil
+          expect(Recipe.first).not_to be_nil
+          expect(Recipe.first).to be_nil
+          expect(Recipe.first).to be_nil
+        end
+      end
+
+      context "with multi thread" do
+        it "selects replications by roundrobin order" do
+          Recipe.using(:slave1).create(title: "test")
+          # Clear connection pool
+          ActiveRecord::Base.establish_connection
+          Recipe.connection.index = 0
+
+          recipes = []
+          pool_size = 5
+          iteration_size = 2
+          slave_size = 3
+          num_of_trials = pool_size * iteration_size
+
+          threads = []
+
+          pool_size.times do |i|
+            threads << Thread.new do
+              iteration_size.times do
+                recipes << Recipe.first
+              end
+            end
+          end
+
+          threads.each(&:join)
+
+          expect(recipes.compact.size).to eq (num_of_trials + slave_size - 1) / slave_size
+        end
       end
     end
   end
