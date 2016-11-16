@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", '>= 3.2.0'
   spec.add_dependency "activesupport", '>= 3.2.0'
+  spec.add_dependency "concurrent-ruby", "~> 1.0", ">= 1.0.2"
   spec.add_development_dependency 'appraisal'
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "coffee-rails", ">= 3.2.0"
