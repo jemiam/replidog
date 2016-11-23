@@ -1,4 +1,3 @@
-require "active_support/core_ext/module/aliasing"
 require "active_support/core_ext/class/attribute"
 
 module Replidog
@@ -8,9 +7,6 @@ module Replidog
       base.proxy_handler = Replidog::ProxyHandler.new
 
       class << base
-        alias_method :connected_without_replidog?, :connected?
-        alias_method :connection_without_replidog, :connection
-
         prepend BaseWithReplidogSupport
       end
     end
