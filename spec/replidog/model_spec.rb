@@ -223,28 +223,6 @@ describe Replidog::Model do
     end
   end
 
-  describe "#transaction" do
-    context "without using" do
-      it "executes SQL query on master connection" do
-        Recipe.using(:slave1).create(title: "test")
-        Recipe.using(:slave2).create(title: "test")
-        Recipe.using(:slave3).create(title: "test")
-        Recipe.transaction do
-          expect(Recipe.first).to be_nil
-        end
-      end
-    end
-
-    context "with using slave name" do
-      it "executes SQL query on slave connection" do
-        Recipe.using(:slave1).create(title: "test")
-        Recipe.using(:slave1).transaction do
-          expect(Recipe.first).not_to be_nil
-        end
-      end
-    end
-  end
-
   describe ".clear_active_connections!" do
     before do
       activate_connection_pools
