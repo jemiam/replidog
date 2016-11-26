@@ -34,11 +34,19 @@ module Replidog
     end
 
     def transaction(options = {}, &block)
-      old = current_connection_name
+      old_connection_name = current_connection_name
       self.current_connection_name ||= :master
       current_connection.transaction(options, &block)
     ensure
-      self.current_connection_name = old
+      self.current_connection_name = old_connection_name
+    end
+
+    def lock(locks = true)
+      old_connection_name = current_connection_name
+      self.current_connection_name ||= :master
+      current_connection.lock(locks)
+    ensure
+      self.current_connection_name = old_connection_name
     end
 
     def connected?

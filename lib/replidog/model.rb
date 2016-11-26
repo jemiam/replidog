@@ -5,13 +5,14 @@ module Replidog
     def self.extended(base)
       base.class_attribute :proxy_handler, instance_writer: false
       base.proxy_handler = Replidog::ProxyHandler.new
+      base.prepend InstanceMethodsWithReplidogSupport
 
       class << base
-        prepend BaseWithReplidogSupport
+        prepend ClassMethodsWithReplidogSupport
       end
     end
 
-    module BaseWithReplidogSupport
+    module ClassMethodsWithReplidogSupport
       def establish_connection(spec = ENV["DATABASE_URL"])
         super
         proxy_handler.remove_connection(self)
@@ -49,6 +50,16 @@ module Replidog
       def clear_all_connections!
         super
         proxy_handler.clear_all_slave_connections! if replicated?
+      end
+    end
+
+    module InstanceMethodsWithReplidogSupport
+      def lock!
+        old_connection_name = self.class.connection.current_connection_name
+        self.class.connection.current_connection_name ||= :master
+        super
+      ensure
+        self.class.connection.current_connection_name = old_connection_name
       end
     end
 

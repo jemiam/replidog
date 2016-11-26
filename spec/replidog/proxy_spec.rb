@@ -6,6 +6,50 @@ describe Replidog::Proxy do
     UserTable.establish_connection :test_user
   end
 
+  describe "#transaction" do
+    context "without using" do
+      it "executes SQL query on master connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave2).create(title: "test")
+        Recipe.using(:slave3).create(title: "test")
+        Recipe.transaction do
+          expect(Recipe.first).to be_nil
+        end
+      end
+    end
+
+    context "with using slave name" do
+      it "executes SQL query on slave connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave1).transaction do
+          expect(Recipe.first).not_to be_nil
+        end
+      end
+    end
+  end
+
+  describe "#lock" do
+    context "without using" do
+      it "executes SQL query on master connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave2).create(title: "test")
+        Recipe.using(:slave3).create(title: "test")
+        Recipe.lock do
+          expect(Recipe.first).to be_nil
+        end
+      end
+    end
+
+    context "with using slave name" do
+      it "executes SQL query on slave connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave1).lock do
+          expect(Recipe.first).not_to be_nil
+        end
+      end
+    end
+  end
+
   describe "#enable_query_cache!" do
     it "enables query cache of all connections" do
       expect{ Recipe.connection.enable_query_cache! }
