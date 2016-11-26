@@ -57,6 +57,9 @@ test_user:
 test_admin:
   <<: *test_default
 
+test_db_migration:
+  <<: *test_default
+
 production:
   <<: *default
   database: replidog_production
