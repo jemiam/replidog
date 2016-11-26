@@ -12,16 +12,16 @@ RSpec.configure do |config|
     case adapter
     when :mysql2
       3.times do |i|
-        system("mysql -u root -e 'drop database dummy_test_slave#{i + 1}' > /dev/null 2> /dev/null")
-        system("mysql -u root -e 'create database dummy_test_slave#{i + 1}'")
-        system("mysqldump -u root dummy_test | mysql -u root dummy_test_slave#{i + 1}")
+        system("mysql -u root -e 'drop database replidog_test_slave#{i + 1}' > /dev/null 2> /dev/null")
+        system("mysql -u root -e 'create database replidog_test_slave#{i + 1}'")
+        system("mysqldump -u root replidog_test | mysql -u root replidog_test_slave#{i + 1}")
       end
-      system("mysql -u root -e 'drop database dummy_test_user' > /dev/null 2> /dev/null")
-      system("mysql -u root -e 'drop database dummy_test_user_slave' > /dev/null 2> /dev/null")
-      system("mysql -u root -e 'create database dummy_test_user'")
-      system("mysql -u root -e 'create database dummy_test_user_slave'")
-      system("mysqldump -u root dummy_test | mysql -u root dummy_test_user")
-      system("mysqldump -u root dummy_test | mysql -u root dummy_test_user_slave")
+      system("mysql -u root -e 'drop database replidog_test_user' > /dev/null 2> /dev/null")
+      system("mysql -u root -e 'drop database replidog_test_user_slave' > /dev/null 2> /dev/null")
+      system("mysql -u root -e 'create database replidog_test_user'")
+      system("mysql -u root -e 'create database replidog_test_user_slave'")
+      system("mysqldump -u root replidog_test | mysql -u root replidog_test_user")
+      system("mysqldump -u root replidog_test | mysql -u root replidog_test_user_slave")
     when :sqlite3
       3.times do |i|
         FileUtils.copy("#{Rails.root}/db/test.sqlite3", "#{Rails.root}/db/test_slave#{i + 1}.sqlite3")

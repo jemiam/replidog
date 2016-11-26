@@ -11,11 +11,11 @@ default: &default
 
 development:
   <<: *default
-  database: dummy_development
+  database: replidog_development
 
 test_default: &test_default
   <<: *default
-  database: dummy_test
+  database: replidog_test
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -23,15 +23,15 @@ test_default: &test_default
 
 test_slave1: &test_slave1
   <<: *test_default
-  database: dummy_test_slave1
+  database: replidog_test_slave1
 
 test_slave2: &test_slave2
   <<: *test_default
-  database: dummy_test_slave2
+  database: replidog_test_slave2
 
 test_slave3: &test_slave3
   <<: *test_default
-  database: dummy_test_slave3
+  database: replidog_test_slave3
 
 test:
   <<: *test_default
@@ -45,11 +45,11 @@ test:
 
 test_user_slave: &test_user_slave
   <<: *test_default
-  database: dummy_test_user_slave
+  database: replidog_test_user_slave
 
 test_user:
   <<: *test_default
-  database: dummy_test_user
+  database: replidog_test_user
   replications:
     slave:
       <<: *test_user_slave
@@ -59,4 +59,4 @@ test_admin:
 
 production:
   <<: *default
-  database: dummy_production
+  database: replidog_production
