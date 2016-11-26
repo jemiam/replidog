@@ -41,6 +41,14 @@ module Replidog
       self.current_connection_name = old_connection_name
     end
 
+    def lock(locks = true)
+      old_connection_name = current_connection_name
+      self.current_connection_name ||= :master
+      current_connection.lock(locks)
+    ensure
+      self.current_connection_name = old_connection_name
+    end
+
     def connected?
       current_model.connection_handler.connected?(current_model) && slave_connection_pool_table.values.any?(&:connected?)
     end

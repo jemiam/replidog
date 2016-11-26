@@ -284,4 +284,24 @@ describe Replidog::Model do
       end
     end
   end
+
+  describe "#lock!" do
+    context "without using" do
+      it "executes SQL query on master connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave2).create(title: "test")
+        Recipe.using(:slave3).create(title: "test")
+        expect{ Recipe.first.lock! }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "with using slave name" do
+      it "executes SQL query on slave connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave1) do
+          expect(Recipe.first.lock!).to eq Recipe.first
+        end
+      end
+    end
+  end
 end
