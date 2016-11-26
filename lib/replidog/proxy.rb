@@ -42,7 +42,7 @@ module Replidog
     end
 
     def connected?
-      current_model.connected_without_replidog? && slave_connection_pool_table.values.any?(&:connected?)
+      current_model.connection_handler.connected?(current_model) && slave_connection_pool_table.values.any?(&:connected?)
     end
 
     def clear_active_slave_connections!
@@ -121,7 +121,7 @@ module Replidog
     end
 
     def master_connection
-      current_model.connection_without_replidog
+      current_model.retrieve_connection
     end
 
     def slave_connection
