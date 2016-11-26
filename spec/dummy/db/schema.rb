@@ -31,14 +31,14 @@ ActiveRecord::Schema.define(version: 0) do
     t.datetime "updated_at"
   end
 
-  create_table "profile", force: true do |t|
+  create_table "profiles", force: true do |t|
     t.integer  "user_id", null: false
     t.string   "nickname", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "admin", force: true do |t|
+  create_table "admins", force: true do |t|
     t.string   "name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"

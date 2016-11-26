@@ -3,19 +3,19 @@
 #
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem 'sqlite3'
-development:
+default: &default
   adapter: mysql2
-  database: dummy_development
   username: root
   pool: 5
   timeout: 5000
 
+development:
+  <<: *default
+  database: replidog_development
+
 test_default: &test_default
-  adapter: mysql2
-  database: dummy_test
-  username: root
-  pool: 5
-  timeout: 5000
+  <<: *default
+  database: replidog_test
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -23,15 +23,15 @@ test_default: &test_default
 
 test_slave1: &test_slave1
   <<: *test_default
-  database: dummy_test_slave1
+  database: replidog_test_slave1
 
 test_slave2: &test_slave2
   <<: *test_default
-  database: dummy_test_slave2
+  database: replidog_test_slave2
 
 test_slave3: &test_slave3
   <<: *test_default
-  database: dummy_test_slave3
+  database: replidog_test_slave3
 
 test:
   <<: *test_default
@@ -45,11 +45,11 @@ test:
 
 test_user_slave: &test_user_slave
   <<: *test_default
-  database: dummy_test_user_slave
+  database: replidog_test_user_slave
 
 test_user:
   <<: *test_default
-  database: dummy_test_user
+  database: replidog_test_user
   replications:
     slave:
       <<: *test_user_slave
@@ -57,9 +57,9 @@ test_user:
 test_admin:
   <<: *test_default
 
+test_db_migration:
+  <<: *test_default
+
 production:
-  adapter: mysql2
-  database: dummy_test
-  username: root
-  pool: 5
-  timeout: 5000
+  <<: *default
+  database: replidog_production

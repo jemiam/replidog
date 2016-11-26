@@ -24,13 +24,13 @@ describe Replidog::Model do
   describe ".establish_connection" do
     context "with no args" do
       it 'establishes connection' do
-        expect(Recipe.connection.current_database).to eq "dummy_test"
+        expect(Recipe.connection.current_database).to eq "replidog_test"
       end
     end
 
     context "with args" do
       it 'establishes connection' do
-        expect(User.connection.current_database).to eq "dummy_test_user"
+        expect(User.connection.current_database).to eq "replidog_test_user"
       end
     end
   end
