@@ -1,3 +1,6 @@
+## 1.1.1
+- Support locking
+
 ## 1.1.0
 - Support multithread
 
