@@ -61,6 +61,13 @@ module Replidog
       ensure
         self.class.connection.current_connection_name = old_connection_name
       end
+
+      def with_lock
+        transaction do
+          lock!
+          yield
+        end
+      end
     end
 
     def replicated?
