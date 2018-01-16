@@ -54,7 +54,7 @@ module Replidog
     end
 
     module InstanceMethodsWithReplidogSupport
-      def lock!
+      def lock!(lock = true)
         old_connection_name = self.class.connection.current_connection_name
         self.class.connection.current_connection_name ||= :master
         super

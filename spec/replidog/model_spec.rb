@@ -304,4 +304,25 @@ describe Replidog::Model do
       end
     end
   end
+
+  describe "#with_lock" do
+    context "with using master name" do
+      it "executes SQL query on master connection" do
+        Recipe.using(:master).create(title: "test")
+        Recipe.using(:master).first.with_lock do
+          Recipe.first.update_attributes!(title: "test_update")
+        end
+        expect(Recipe.first).to eq Recipe.first
+      end
+    end
+
+    context "with using slave name" do
+      it "executes SQL query on slave connection" do
+        Recipe.using(:slave1).create(title: "test")
+        Recipe.using(:slave2).create(title: "test")
+        Recipe.using(:slave3).create(title: "test")
+        expect{ Recipe.first.with_lock }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
 end
