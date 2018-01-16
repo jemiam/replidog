@@ -1,3 +1,9 @@
+## 1.1.3
+- Fix locking
+
+## 1.1.2
+- Support Rails 5.1
+
 ## 1.1.1
 - Support locking
 
