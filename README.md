@@ -9,7 +9,7 @@ Based on https://github.com/r7kamura/replicat
 * Multiple master/slave
 * Auto switching between master/slave
 * Supports connection management and query cache
-* Supports Rails 3.2, 4.0, 4,1, 4.2, 5.0
+* Supports Rails 3.2, 4.0, 4,1, 4.2, 5.0, 5.1
 
 ## Installation
 
