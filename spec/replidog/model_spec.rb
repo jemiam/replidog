@@ -311,7 +311,7 @@ describe Replidog::Model do
         Recipe.using(:master).create(title: "test")
         Recipe.using(:master) do
           Recipe.first.with_lock do
-            Recipe.first.update!(title: "test_update")
+            Recipe.first.update_attributes!(title: "test_update")
           end
           expect(Recipe.first).to eq Recipe.first
         end
